@@ -5,6 +5,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import core.UiEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -80,8 +81,11 @@ class AuthScreenModel : StateScreenModel<AuthScreenState>(AuthScreenState()) {
     }
 
 
+    private var onLoginClickedJob: Job? = null
+
     fun onLoginClicked() {
-        screenModelScope.launch(Dispatchers.IO) {
+        onLoginClickedJob?.cancel()
+        onLoginClickedJob = screenModelScope.launch(Dispatchers.IO) {
             toggleLoading(true)
             val validation = validateEmailPassword(state.value.email, state.value.password)
             delay(2000L)
@@ -90,8 +94,7 @@ class AuthScreenModel : StateScreenModel<AuthScreenState>(AuthScreenState()) {
                 toggleLoading(false)
                 return@launch
             }
-            toggleLoading(true)
-            delay(5000L)
+            delay(3000L)
             toggleLoading(false)
             showUserMessage("You are logged in.")
         }
