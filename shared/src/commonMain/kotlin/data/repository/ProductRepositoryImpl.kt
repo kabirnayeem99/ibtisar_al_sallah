@@ -33,7 +33,7 @@ class ProductRepositoryImpl(private val productApiService: ProductApiService) : 
                 val id = "${pd.id}_${clock.toEpochMilliseconds()}"
                 Product(
                     thumbnail = pd.thumbnail,
-                    price = pd.price,
+                    price = "৳ ${pd.price}.00",
                     rating = pd.rating,
                     id = id,
                     title = pd.title.capitalize(Locale.current),

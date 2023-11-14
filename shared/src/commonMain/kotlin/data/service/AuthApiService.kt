@@ -2,6 +2,7 @@ package data.service
 
 import data.dto.AuthRequestDto
 import data.dto.AuthUserDto
+import data.dto.ErrorResponseDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.headers
@@ -21,6 +22,7 @@ class AuthApiService(private val client: HttpClient) {
             setBody(requestDto)
         }
         if (req.status == HttpStatusCode.OK) return req.body()
-        throw Exception(req.status.description)
+        val errorDto = req.body<ErrorResponseDto>()
+        throw Exception(errorDto.message ?: req.status.description)
     }
 }

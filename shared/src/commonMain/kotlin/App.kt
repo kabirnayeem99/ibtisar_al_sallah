@@ -1,5 +1,6 @@
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.navigator.Navigator
+import presentation.auth.AuthScreen
 import presentation.products.ProductsScreen
 
 @Composable
