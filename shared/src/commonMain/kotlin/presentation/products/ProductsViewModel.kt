@@ -24,7 +24,11 @@ class ProductsViewModel(private val productRepository: ProductRepository) :
     private var page = 1
     fun fetchProducts() {
         screenModelScope.launch(Dispatchers.IO) {
-            toggleLoading(true)
+            toggleLoading(page == 1)
+            if (page > 6) {
+                showUserMessage("No more products. Come to an end.")
+                return@launch
+            }
             val productResult = productRepository.getProducts(page++)
             productResult.fold(
                 onSuccess = { products ->

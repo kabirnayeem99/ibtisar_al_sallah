@@ -1,8 +1,8 @@
 package presentation.products
 
-import domain.entity.ProductItem
+import domain.entity.Product
 
 data class ProductsUiState(
     val isLoading: Boolean = false,
-    val products: List<ProductItem> = emptyList()
+    val products: List<Product> = emptyList()
 )

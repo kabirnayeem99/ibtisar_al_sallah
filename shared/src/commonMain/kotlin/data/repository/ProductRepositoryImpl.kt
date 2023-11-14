@@ -2,28 +2,19 @@ package data.repository
 
 import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.intl.Locale
+import co.touchlab.kermit.Logger
+import data.dto.ProductsDto
 import data.service.ProductApiService
-import domain.entity.ProductItem
+import domain.entity.Product
 import domain.repository.ProductRepository
 import kotlinx.datetime.Clock
 
 class ProductRepositoryImpl(private val productApiService: ProductApiService) : ProductRepository {
-    override suspend fun getProducts(page: Int): Result<List<ProductItem>> {
+    override suspend fun getProducts(page: Int): Result<List<Product>> {
         return try {
-            val clock = Clock.System.now()
-            val skip = page * 10
+            val skip = (page - 1) * 10
             val productDto = productApiService.getProducts(skip)
-            val products = productDto.products.take(10).map { pd ->
-                ProductItem(
-                    thumbnail = pd.thumbnail,
-                    price = pd.price,
-                    rating = pd.rating,
-                    id = "${pd.id}_${clock.toEpochMilliseconds()}",
-                    title = pd.title.capitalize(Locale.current),
-                    category = pd.category.capitalize(Locale.current),
-                    brand = pd.brand.capitalize(Locale.current)
-                )
-            }
+            val products = mapDtoToProductItem(productDto)
             if (products.isEmpty() && page == 1) {
                 throw IllegalStateException("No products")
             } else if (products.isEmpty() && page > 1) {
@@ -34,4 +25,27 @@ class ProductRepositoryImpl(private val productApiService: ProductApiService) : 
             Result.failure(e)
         }
     }
+
+    private fun mapDtoToProductItem(productDto: ProductsDto): List<Product> {
+        val clock = Clock.System.now()
+        return try {
+            productDto.products.map { pd ->
+                val id = "${pd.id}_${clock.toEpochMilliseconds()}"
+                Product(
+                    thumbnail = pd.thumbnail,
+                    price = pd.price,
+                    rating = pd.rating,
+                    id = id,
+                    title = pd.title.capitalize(Locale.current),
+                    category = pd.category.capitalize(Locale.current),
+                    brand = pd.brand.capitalize(Locale.current)
+                )
+            }
+        } catch (e: Exception) {
+            Logger.e(TAG, e)
+            return emptyList()
+        }
+    }
 }
+
+private const val TAG = "ProductRepositoryImpl"

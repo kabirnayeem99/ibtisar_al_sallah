@@ -1,6 +1,6 @@
 package domain.entity
 
-data class ProductItem(
+data class Product(
     val thumbnail: String = "",
     val price: Int = 0,
     val rating: Double = 0.0,

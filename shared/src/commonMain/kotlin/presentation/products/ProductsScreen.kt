@@ -1,8 +1,9 @@
 package presentation.products
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -28,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
 import core.UiEvent
+import domain.entity.Product
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -52,43 +54,49 @@ class ProductsScreen : Screen {
         Scaffold(
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         ) {
-            LazyVerticalGrid(columns = GridCells.Adaptive(150.dp)) {
-                if (uiState.value.isLoading) item {
-                    Box(modifier = Modifier.fillMaxWidth().height(45.dp)) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(45.dp).align(
-                                Alignment.Center
-                            )
+            AnimatedVisibility(visible = uiState.value.isLoading) {
+                Box(modifier = Modifier.fillMaxSize().height(45.dp)) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(45.dp).align(
+                            Alignment.Center
                         )
-                    }
+                    )
                 }
-                items(products.size, key = { index ->
-                    products[index].id
-                }) { index ->
+            }
+            LazyVerticalGrid(columns = GridCells.Adaptive(150.dp)) {
+
+                items(products.size, key = { index -> products[index].id }) { index ->
                     val product = products[index]
                     if (product.id == products.lastOrNull()?.id) viewModel.fetchProducts()
 
-                    Card(
-                        shape = RoundedCornerShape(8.dp),
-                        backgroundColor = Color(0xfffefefe),
-                        elevation = 0.05.dp,
-                        modifier = Modifier.padding(4.dp)
-                    ) {
-                        Column(modifier = Modifier.padding(12.dp)) {
-                            KamelImage(
-                                resource = asyncPainterResource(product.thumbnail),
-                                contentDescription = product.title + " image",
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.height(90.dp)
-                            )
-                            Text(product.title, style = MaterialTheme.typography.h6)
-                            Text("Brand: ${product.brand}")
-                            Text("Price: \$${product.price}")
-                            Text("Category: ${product.category}")
-                        }
-                    }
+                    ProductItem(product)
                 }
             }
         }
     }
+
+
+    @Composable
+    private fun ProductItem(product: Product) {
+        Card(
+            shape = RoundedCornerShape(8.dp),
+            backgroundColor = Color(0xfffefefe),
+            elevation = 0.05.dp,
+            modifier = Modifier.padding(4.dp)
+        ) {
+            Column(modifier = Modifier.padding(12.dp)) {
+                KamelImage(
+                    resource = asyncPainterResource(product.thumbnail),
+                    contentDescription = product.title + " image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.height(90.dp)
+                )
+                Text(product.title, style = MaterialTheme.typography.h6)
+                Text("Brand: ${product.brand}")
+                Text("Price: \$${product.price}")
+                Text("Category: ${product.category}")
+            }
+        }
+    }
 }
+
