@@ -35,6 +35,7 @@ class AuthScreen : Screen {
         val snackbarHostState = remember { SnackbarHostState() }
         val screenModel = rememberScreenModel { AuthScreenModel() }
         val uiState = screenModel.state.collectAsState()
+        val isLoading = uiState.value.isLoading
 
         LaunchedEffect(true) {
             screenModel.uiEvent.collect { event ->
@@ -69,7 +70,7 @@ class AuthScreen : Screen {
                                 autoCorrect = true,
                                 imeAction = ImeAction.Next
                             ),
-                            enabled = !uiState.value.isLoading,
+                            enabled = !isLoading,
                         )
                     }
                     item {
@@ -84,16 +85,16 @@ class AuthScreen : Screen {
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Password, imeAction = ImeAction.Done
                             ),
-                            enabled = !uiState.value.isLoading,
+                            enabled = !isLoading,
                         )
                     }
                     item {
-                        AnimatedVisibility(visible = !uiState.value.isLoading) {
+                        AnimatedVisibility(visible = !isLoading) {
                             Button(onClick = { screenModel.onLoginClicked() }) {
                                 Text("Log In")
                             }
                         }
-                        AnimatedVisibility(visible = uiState.value.isLoading) {
+                        AnimatedVisibility(visible = isLoading) {
                             CircularProgressIndicator(
                                 strokeWidth = 4.dp, modifier = Modifier.size(32.dp)
                             )
