@@ -42,6 +42,10 @@ kotlin {
 //                val napierVersion = "2.9.1"
 //                implementation ("io.github.aakira:napier:$napierVersion")
 
+                implementation("media.kamel:kamel-image:0.8.3")
+
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
+
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)

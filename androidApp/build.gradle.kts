@@ -24,6 +24,12 @@ android {
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
 
+    packaging {
+        resources {
+            excludes += "META-INF/versions/9/previous-compilation-data.bin"
+
+        }
+    }
     defaultConfig {
         applicationId = "io.github.kabirnayeem99.IbtisarAlSallah"
         minSdk = (findProperty("android.minSdk") as String).toInt()

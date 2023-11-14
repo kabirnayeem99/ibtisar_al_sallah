@@ -21,12 +21,19 @@ class ProductsViewModel(private val productRepository: ProductRepository) :
         fetchProducts()
     }
 
-    private fun fetchProducts() {
+    private var page = 1
+    fun fetchProducts() {
         screenModelScope.launch(Dispatchers.IO) {
             toggleLoading(true)
-            val productResult = productRepository.getProducts()
+            val productResult = productRepository.getProducts(page++)
             productResult.fold(
-                onSuccess = { products -> mutableState.update { it.copy(products = products) } },
+                onSuccess = { products ->
+                    mutableState.update {
+                        val currentProducts = it.products.toMutableList()
+                        currentProducts.addAll(products)
+                        it.copy(products = currentProducts)
+                    }
+                },
                 onFailure = { e -> showUserMessage(e.message) },
             )
             toggleLoading(false)
