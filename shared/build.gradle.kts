@@ -10,9 +10,7 @@ kotlin {
     jvm("desktop")
 
     listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
+        iosX64(), iosArm64(), iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "shared"
@@ -23,11 +21,15 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                val voyagerVersion = "1.0.0-rc10"
+                implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
+                implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVersion")
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
-                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-                implementation(compose.components.resources)
+                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class) implementation(
+                    compose.components.resources
+                )
             }
         }
         val androidMain by getting {
