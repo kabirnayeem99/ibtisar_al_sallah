@@ -17,3 +17,8 @@ data class AuthUserDto(
 )
 
 
+@Serializable
+data class AuthRequestDto(
+    @SerialName("username") val username: String,
+    @SerialName("password") val password: String,
+)

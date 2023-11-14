@@ -21,16 +21,26 @@ kotlin {
 
     sourceSets {
         val ktorVersion = "2.3.5"
+        val voyagerVersion = "1.0.0-rc10"
 
         val commonMain by getting {
             dependencies {
-                val voyagerVersion = "1.0.0-rc10"
                 implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
                 implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVersion")
 
                 implementation("io.ktor:ktor-client-core:$ktorVersion")
+                implementation("io.ktor:ktor-client-logging:$ktorVersion")
                 implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+
+                val koinVersion = "3.5.0"
+                implementation("io.insert-koin:koin-core:$koinVersion")
+                implementation("cafe.adriel.voyager:voyager-koin:$voyagerVersion")
+//                implementation("io.insert-koin:koin-ktor:$koinVersion")
+
+                implementation("co.touchlab:kermit:2.0.2")
+//                val napierVersion = "2.9.1"
+//                implementation ("io.github.aakira:napier:$napierVersion")
 
                 implementation(compose.runtime)
                 implementation(compose.foundation)
@@ -46,6 +56,8 @@ kotlin {
                 api("androidx.appcompat:appcompat:1.6.1")
                 api("androidx.core:core-ktx:1.12.0")
                 implementation("io.ktor:ktor-client-android:$ktorVersion")
+                val koinAndroidVersion = "3.5.0"
+                implementation("io.insert-koin:koin-android:$koinAndroidVersion")
             }
         }
         val iosX64Main by getting

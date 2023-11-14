@@ -20,22 +20,30 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import core.UiEvent
+import presentation.products.ProductsScreen
 
 class AuthScreen : Screen {
+    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
         val snackbarHostState = remember { SnackbarHostState() }
-        val screenModel = rememberScreenModel { AuthScreenModel() }
+        val screenModel = getScreenModel<AuthViewModel>()
         val uiState = screenModel.state.collectAsState()
         val isLoading = uiState.value.isLoading
+        val keyboardController = LocalSoftwareKeyboardController.current
 
         LaunchedEffect(true) {
             screenModel.uiEvent.collect { event ->
@@ -43,6 +51,12 @@ class AuthScreen : Screen {
                     is UiEvent.Warning -> snackbarHostState.showSnackbar(event.message)
                     is UiEvent.Error -> snackbarHostState.showSnackbar(event.message)
                 }
+            }
+        }
+
+        LaunchedEffect(true) {
+            screenModel.loggedIn.collect { loggedId ->
+                if (loggedId) navigator.push(ProductsScreen())
             }
         }
 
@@ -61,12 +75,12 @@ class AuthScreen : Screen {
                         OutlinedTextField(
                             value = uiState.value.email,
                             onValueChange = {
-                                screenModel.onEmailChanged(it)
+                                screenModel.onUsernameChanged(it)
                             },
-                            label = { Text("Email") },
+                            label = { Text("Username") },
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Email,
+                                keyboardType = KeyboardType.Text,
                                 autoCorrect = true,
                                 imeAction = ImeAction.Next
                             ),
@@ -90,7 +104,10 @@ class AuthScreen : Screen {
                     }
                     item {
                         AnimatedVisibility(visible = !isLoading) {
-                            Button(onClick = { screenModel.onLoginClicked() }) {
+                            Button(onClick = {
+                                keyboardController?.hide()
+                                screenModel.onLoginClicked()
+                            }) {
                                 Text("Log In")
                             }
                         }

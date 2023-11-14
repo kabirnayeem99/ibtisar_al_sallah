@@ -10,6 +10,9 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 implementation(project(":shared"))
+                val koinAndroidVersion = "3.5.0"
+                implementation("io.insert-koin:koin-android:$koinAndroidVersion")
+
             }
         }
     }
