@@ -1,11 +1,10 @@
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.navigator.Navigator
-import presentation.auth.AuthScreen
-import presentation.products.ProductsScreen
+import presentation.products.HomeScreen
 
 @Composable
 fun App() {
-    Navigator(screen = ProductsScreen(), onBackPressed = { currentScreen ->
+    Navigator(screen = HomeScreen(), onBackPressed = { currentScreen ->
         println("Navigator: Pop screen ${currentScreen.key}")
         true
     })

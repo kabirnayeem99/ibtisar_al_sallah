@@ -1,5 +1,10 @@
 package presentation.products
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
@@ -45,6 +51,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
 import core.UiEvent
+import domain.entity.Category
 import domain.entity.Product
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
@@ -52,10 +59,10 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import presentation.common.SallahColor
 import presentation.common.uiitems.ProgressIndicator
 
-class ProductsScreen : Screen {
+class HomeScreen : Screen {
     @Composable
     override fun Content() {
-        val viewModel = getScreenModel<ProductsViewModel>()
+        val viewModel = getScreenModel<HomeViewModel>()
         val uiState = viewModel.state.collectAsState()
         val products = uiState.value.products
         val snackbarHostState = remember { SnackbarHostState() }
@@ -81,9 +88,86 @@ class ProductsScreen : Screen {
                 Column {
                     HeaderText()
                     SearchButton()
+                    CategoryRow(uiState.value.categories)
+                    Spacer(modifier = Modifier.height(20.dp))
                     ProductListLabel()
                     ProductItemList(products) { viewModel.fetchProducts() }
                 }
+            }
+        }
+    }
+
+    @Composable
+    private fun CategoryRow(categories: List<Category>) {
+        AnimatedVisibility(categories.isNotEmpty(), enter = expandHorizontally()) {
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(17.dp),
+                modifier = Modifier.padding(horizontal = 20.dp)
+            ) {
+                for (category in categories) {
+                    item {
+                        CategoryItem(category)
+                    }
+                }
+                item {
+                    Card(
+                        modifier = Modifier.width(100.dp).height(95.dp),
+                        backgroundColor = SallahColor.WhiteWhisper,
+                        elevation = 0.dp,
+                        border = BorderStroke(
+                            width = 0.3.dp, color = SallahColor.GreyWoodBark.copy(alpha = 0.2F)
+                        ),
+                        shape = RoundedCornerShape(15.dp)
+                    ) {
+                        Box(modifier = Modifier.padding(vertical = 3.dp, horizontal = 12.dp)) {
+                            Text(
+                                "View All",
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.align(Alignment.Center),
+                                style = MaterialTheme.typography.body1.copy(
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = SallahColor.GreyWoodBark,
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun CategoryItem(category: Category) {
+        Card(
+            modifier = Modifier.width(100.dp).height(95.dp),
+            backgroundColor = SallahColor.WhiteWhisper,
+            elevation = 0.dp,
+            border = BorderStroke(
+                width = 0.3.dp, color = SallahColor.GreyWoodBark.copy(alpha = 0.2F)
+            ),
+            shape = RoundedCornerShape(15.dp)
+        ) {
+            Box(modifier = Modifier.padding(vertical = 3.dp, horizontal = 12.dp)) {
+                KamelImage(
+                    asyncPainterResource(category.image.ifBlank { "https://wolper.com.au/wp-content/uploads/2017/10/image-placeholder.jpg" }),
+                    "",
+                    modifier = Modifier.padding(bottom = 16.dp).size(59.dp).align(Alignment.Center)
+                        .clip(RoundedCornerShape(12.dp)),
+                    contentScale = ContentScale.Crop,
+                )
+                Spacer(modifier = Modifier.height(3.dp))
+                Text(
+                    category.name,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(bottom = 3.dp).align(Alignment.BottomCenter),
+                    style = MaterialTheme.typography.body1.copy(
+                        fontSize = 12.sp,
+                        color = SallahColor.GreyWoodBark,
+                    )
+                )
             }
         }
     }
@@ -172,17 +256,19 @@ class ProductsScreen : Screen {
 
     @Composable
     private fun ProductItemList(products: List<Product>, onFetchMore: () -> Unit) {
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(154.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-            modifier = Modifier.padding(horizontal = 24.dp)
-        ) {
-            items(products.size, key = { index -> products[index].id }) { index ->
-                val product = products[index]
-                if (product.id == products.lastOrNull()?.id) onFetchMore()
+        AnimatedVisibility(products.isNotEmpty(), enter = expandVertically()) {
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(154.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp),
+                modifier = Modifier.padding(horizontal = 24.dp)
+            ) {
+                items(products.size, key = { index -> products[index].id }) { index ->
+                    val product = products[index]
+                    if (product.id == products.lastOrNull()?.id) onFetchMore()
 
-                ProductItem(product)
+                    ProductItem(product)
+                }
             }
         }
     }

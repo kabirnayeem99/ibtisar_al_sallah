@@ -11,14 +11,24 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class ProductsViewModel(private val productRepository: ProductRepository) :
-    StateScreenModel<ProductsUiState>(ProductsUiState()) {
+class HomeViewModel(private val productRepository: ProductRepository) :
+    StateScreenModel<HomeUiState>(HomeUiState()) {
 
     private val _uiEvent = MutableSharedFlow<UiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
     init {
         fetchProducts()
+        fetchCategories()
+    }
+
+    private fun fetchCategories() {
+        screenModelScope.launch(Dispatchers.IO) {
+            productRepository.getCategories(3).fold(
+                onSuccess = { cats -> mutableState.update { it.copy(categories = cats) } },
+                onFailure = { e -> showUserMessage(e.message) }
+            )
+        }
     }
 
     private var page = 1

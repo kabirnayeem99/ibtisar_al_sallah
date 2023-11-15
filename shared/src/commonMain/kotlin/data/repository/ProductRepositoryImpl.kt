@@ -5,6 +5,7 @@ import androidx.compose.ui.text.intl.Locale
 import co.touchlab.kermit.Logger
 import data.dto.ProductsDto
 import data.service.ProductApiService
+import domain.entity.Category
 import domain.entity.Product
 import domain.repository.ProductRepository
 import kotlinx.datetime.Clock
@@ -22,6 +23,21 @@ class ProductRepositoryImpl(private val productApiService: ProductApiService) : 
             }
             Result.success(products)
         } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getCategories(amount: Int): Result<List<Category>> {
+        return try {
+            val categoriesNames = productApiService.getCategories()
+            if (categoriesNames.isEmpty()) throw IllegalStateException("No categories")
+            val clock = Clock.System.now()
+            val categories = categoriesNames.take(amount).map { catName ->
+                Category(id = "${clock.nanosecondsOfSecond}", name = catName.capitalize(Locale.current), image = "")
+            }
+            Result.success(categories)
+        } catch (e: Exception) {
+            Logger.e(TAG, e)
             Result.failure(e)
         }
     }

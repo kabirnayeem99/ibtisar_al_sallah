@@ -52,7 +52,7 @@ import presentation.common.SallahColor
 import presentation.common.uiitems.LogoImage
 import presentation.common.uiitems.PrimaryActionButton
 import presentation.common.uiitems.ProgressIndicator
-import presentation.products.ProductsScreen
+import presentation.products.HomeScreen
 
 class AuthScreen : Screen {
     @OptIn(ExperimentalComposeUiApi::class)
@@ -76,7 +76,7 @@ class AuthScreen : Screen {
 
         LaunchedEffect(true) {
             viewModel.loggedIn.collect { loggedId ->
-                if (loggedId) navigator.push(ProductsScreen())
+                if (loggedId) navigator.push(HomeScreen())
             }
         }
 

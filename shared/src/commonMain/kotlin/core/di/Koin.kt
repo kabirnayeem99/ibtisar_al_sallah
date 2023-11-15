@@ -16,7 +16,7 @@ import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 import presentation.auth.AuthViewModel
-import presentation.products.ProductsViewModel
+import presentation.products.HomeViewModel
 
 
 fun initKoin(appDeclaration: KoinAppDeclaration = {}) = startKoin {
@@ -58,5 +58,5 @@ val repositoryModule = module {
 
 val viewModelModule = module {
     factory { AuthViewModel(get()) }
-    factory { ProductsViewModel(get()) }
+    factory { HomeViewModel(get()) }
 }

@@ -12,4 +12,10 @@ class ProductApiService(private val client: HttpClient) {
         if (req.status == HttpStatusCode.OK) return req.body()
         throw Exception(req.status.description)
     }
+
+    suspend fun getCategories(): List<String> {
+        val req = client.get("https://dummyjson.com/products/categories")
+        if (req.status == HttpStatusCode.OK) return req.body()
+        throw Exception(req.status.description)
+    }
 }
